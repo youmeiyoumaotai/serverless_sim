@@ -79,7 +79,7 @@ impl Scheduler for LoadLeastScheduler {
 
             //迭代请求中的函数，选择最合适的节点进行调度
             for fnid in fns {
-                let sche_nodeid = self.select_best_node_to_fn(fnid, env);
+                let mut sche_nodeid = self.select_best_node_to_fn(fnid, env);
 
                 log::info!("schedule fn {} to node {}", fnid, sche_nodeid);
 

@@ -64,6 +64,7 @@ impl RotateScheduler {
 
                 if !node_list.is_empty() {
                     node_id = node_list[(self.last_schedule_node_id + 1) % node_list.len()];
+                    self.last_schedule_node_id = node_id;
                 }
 
                 // 使用 match 进行错误处理，避免 panic
