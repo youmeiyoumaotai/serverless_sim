@@ -1,0 +1,17 @@
+mechanism:
+  scale_num: 
+    no:
+    hpa:
+    lass:
+    ai:
+  scale_down_exec: 
+    most_idle:
+  scale_up_exec: 
+    most_rsc:
+  sche:
+    faasflow:
+    fnche:
+    pass:
+    pos:
+    sche_OCS:
+    sche_FaaSRank:

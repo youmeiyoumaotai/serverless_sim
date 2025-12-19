@@ -1,0 +1,40 @@
+
+avg_cnt: 1
+
+## filter with fixed value
+filter: 
+#   dag_type: single
+  cold_start: high
+#   fn_type: cpu
+#   scale_down_exec: default.
+#   # request_freq: low
+  
+## each group bars
+targets_alias:
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'greedy.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(greedy.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'hash.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(hash.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(load_least.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'random.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(random.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_FaaSRank.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_FaaSRank.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_Hiku.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_Hiku.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_OCS.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_OCS.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_jiagu.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_jiagu.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_nash.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_nash.).ic(no_evict.)']
+- [{'rand_seed': '', 'request_freq': 'high', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'sche_orion.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '0'}, 'sd.rfhigh.dtmix.cshigh.ftcpu.nml0.mtscale_sche_separated.scl(hpa.)(default.)(least_task.)[(careful_down.)].scd(sche_orion.).ic(no_evict.)']
+
+
+## group on x axis:
+group: 
+  by: cold_start
+  types: [high]
+  alias: ''
+  type_alias: ['']
+
+## y axis
+values:
+# - {alias: Throughput, trans: throughput}
+- {alias: Cost, trans: cost_per_req}
+- {alias: Latency(ms), trans: '[waitsche_time_per_req,coldstart_time_per_req,datarecv_time_per_req,exe_time_per_req]'} # convert 10ms to ms
+- {alias: Quality-Price Ratio, trans: 'rps/cost_per_req/time_per_req if cost_per_req>0 and time_per_req>0  else 0'}
+- {alias: Throuphput, trans: rps*1000}
+- {alias: Avg Container Count, trans: fn_container_cnt}
