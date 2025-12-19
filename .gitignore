@@ -12,3 +12,4 @@ log
 MAPPO_MPE
 run_multi_fn_dag.py
 azurefunctions-dataset2019/
+serverless_sim/cache/
