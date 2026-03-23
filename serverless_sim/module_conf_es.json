@@ -1,45 +1,46 @@
 {
   "mech_type": {
-    "scale_sche_joint": null,
     "no_scale": null,
-    "scale_sche_separated": null
+    "scale_sche_separated": null,
+    "scale_sche_joint": null
   },
   "scale_num": {
+    "hpa": null,
+    "Q_learning_hpa": null,
+    "temp_scaler": null,
+    "lass": null,
     "no": null,
     "full_placement": null,
     "rela": null,
-    "ensure_scaler": null,
-    "hpa": null,
-    "lass": null,
-    "temp_scaler": null
+    "ensure_scaler": null
   },
   "scale_down_exec": {
     "default": null
   },
   "scale_up_exec": {
-    "no": null,
-    "least_task": null
+    "least_task": null,
+    "no": null
   },
   "sche": {
-    "random": null,
-    "greedy": null,
-    "ensure_scheduler": null,
-    "pos": null,
-    "consistenthash": null,
-    "faasflow": null,
-    "load_least": null,
-    "hash": null,
-    "pass": null,
     "rotate": null,
+    "pass": null,
+    "consistenthash": null,
+    "ensure_scheduler": null,
+    "load_least": null,
     "bp_balance": null,
-    "fnsche": null
+    "fnsche": null,
+    "pos": null,
+    "faasflow": null,
+    "hash": null,
+    "random": null,
+    "greedy": null
   },
   "filter": {
     "careful_down": null
   },
   "instance_cache_policy": {
-    "fifo": null,
     "no_evict": null,
-    "lru": null
+    "lru": null,
+    "fifo": null
   }
 }

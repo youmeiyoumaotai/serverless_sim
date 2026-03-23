@@ -25,16 +25,32 @@ impl ScaleNum for EnsureScaleNum {
     fn scale_for_fn(&mut self, env: &SimEnvObserve, fnid: FnId, _action: &ESActionWrapper) -> usize {
 
         let mut need_to_schedule = false;
-        // 找到这一帧需要调度的函数
-        for (_req_id, req) in env.core().requests_mut().iter_mut() {
-            let schedule_able_fns = schedule_helper::collect_task_to_sche(
-                req,
-                env,
-                schedule_helper::CollectTaskConfig::All,
-            );
-            for sche_fnid in schedule_able_fns.iter() {
-                if sche_fnid == &fnid {
+        // // 找到这一帧需要调度的函数
+        // for (_req_id, req) in env.core().requests_mut().iter_mut() {
+        //     let schedule_able_fns = schedule_helper::collect_task_to_sche(
+        //         req,
+        //         env,
+        //         schedule_helper::CollectTaskConfig::All,
+        //     );
+        //     for sche_fnid in schedule_able_fns.iter() {
+        //         if sche_fnid == &fnid {
+        //             need_to_schedule = true;
+        //         }
+        //     }
+        // }
+        let requests = env.core().requests();
+        let current_frame = env.core().current_frame();
+        for (_, req) in requests.iter().filter(|(_, req)| req.begin_frame == current_frame) {
+            // 拿到该请求对应的DAG
+            let mut walker = env.dag(req.dag_i).new_dag_walker();
+            // 遍历DAG里面的所有图节点
+            while let Some(fngid) = walker.next(&env.dag(req.dag_i).dag_inner) {
+                // 得到该图节点对应的函数
+                let fnid_in_dag = env.dag_inner(req.dag_i)[fngid];
+                // 累加当前函数到达的次数
+                if fnid_in_dag == fnid {
                     need_to_schedule = true;
+                    break;
                 }
             }
         }

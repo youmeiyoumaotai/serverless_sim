@@ -270,7 +270,7 @@ impl Node {
                     node.container(*to_replace).unwrap().is_idle()
                 }),
             );
-            log::info!("old{:?}", old);
+            // log::info!("old{:?}", old);
             (old, flag)
         };
 
@@ -305,7 +305,7 @@ impl Node {
                 // but we need to add mem to node in this frame because it's new container
                 *self.mem.borrow_mut() += con_mem_take;
             } else {
-                log::info!("内存不够，取消缓存标记{}", fnid);
+                // log::info!("内存不够，取消缓存标记{}", fnid);
                 let mut node_cache = self.instance_cache_policy.borrow_mut();
                 assert!(node_cache.remove_all(&fnid));
             }

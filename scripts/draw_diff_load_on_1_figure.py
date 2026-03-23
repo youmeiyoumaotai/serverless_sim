@@ -341,7 +341,8 @@ def draw_with_draw_meta(drawmeta,conf):
     opacity = 0.4
     error_config = {'ecolor': '0.3'}
     patterns = ('x', '\\', '*', 'o', '.','O')
-    colors=["#FC6B05","#FFB62B","#9BB7BB","#99D8DB","#65B017","#32CD32","#228B22","#8A2BE2"]
+    colors=["#FC6B05","#FFB62B","#9BB7BB","#99D8DB","#65B017","#32CD32","#CD00CD","#8A2BE2"]
+    # colors=["#FC6B05","#FFB62B","#9BB7BB","#99D8DB","#65B017","#32CD32","#228B22","#8A2BE2"]
     
     plotidx=0
     for plot in plots:

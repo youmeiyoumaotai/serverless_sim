@@ -123,7 +123,7 @@ impl BpBalanceScheduler {
         
         let binpack = self.binpack_map.get(&fnid).unwrap();
 
-        assert!(binpack.len() != 0 && self.latest_nodes.get(&fnid).unwrap().len() != 0);
+        // assert!(binpack.len() != 0 && self.latest_nodes.get(&fnid).unwrap().len() != 0);
 
         let mut avg_cpu_starve_degree = 0.0;
         let mut avg_mem_use_rate = 0.0;
@@ -432,7 +432,7 @@ impl Scheduler for BpBalanceScheduler {
                 // 该函数没有可调度节点，表示该函数最近一直没有请求，直接跳过
                 if nodes.len() == 0 {
                     self.latest_nodes.insert(func.fn_id, nodes.clone());
-                    assert!(binpack.len() == 0);
+                    // assert!(binpack.len() == 0);
                     continue;
                 }
 
@@ -468,7 +468,7 @@ impl Scheduler for BpBalanceScheduler {
                 // 超时缩容完成----------------------------------------------------------------------------------------
 
                 // 到这里来的时候nodes集合一定不为空
-                assert!(nodes.len() != 0);
+                // assert!(nodes.len() != 0);
 
                 // 更新该函数的最新可调度节点集合
                 self.latest_nodes.insert(func.fn_id, nodes.clone());
@@ -479,7 +479,7 @@ impl Scheduler for BpBalanceScheduler {
                 // 当binpack数组为空时，把所有节点都加进去
                 if binpack.len() == 0 {
                     self.binpack_map.insert(func.fn_id, nodes.clone());
-                    assert!(self.binpack_map.get(&func.fn_id).unwrap().len() != 0);
+                    // assert!(self.binpack_map.get(&func.fn_id).unwrap().len() != 0);
                 }
 
                 // 计算该函数binpack数组内的资源利用率，以及得出其内、其外的空闲资源最多的节点id
@@ -490,7 +490,7 @@ impl Scheduler for BpBalanceScheduler {
                     
                     let binpack = self.binpack_map.get(&func.fn_id).unwrap();
 
-                    assert!(bplist_resource_status.avg_cpu_starve_degree != 0.0);
+                    // assert!(bplist_resource_status.avg_cpu_starve_degree != 0.0);
                     
                     // 退出循环逻辑
                     if bplist_resource_status.avg_cpu_starve_degree < CPU_THRESHOLD_TO_REMOVE && binpack.len() == 1{

@@ -14,27 +14,26 @@ filter:
 ## each group bars
 targets_alias:
 # 整体方案绘图表
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'temp_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'Ours']
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'ensure_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'ensure_scheduler.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'ENSURE']
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'no.', 'scale_down_exec': 'default.', 'scale_up_exec': 'no.', 'sche': 'faasflow.', 'instance_cache_policy': 'no_evict.', 'filter': '', 'no_mech_latency': '1'}, 'faasflow']
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'lass.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'LaSS+LoadLeast']
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+LoadLeast']
-- [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'pass.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+PASS']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'temp_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'Ours']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'ensure_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'ensure_scheduler.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'ENSURE']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'no.', 'scale_down_exec': 'default.', 'scale_up_exec': 'no.', 'sche': 'faasflow.', 'instance_cache_policy': 'no_evict.', 'filter': '', 'no_mech_latency': '1'}, 'faasflow']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'lass.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'LaSS+LoadLeast']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+LoadLeast']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'pass.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+PASS']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'Q_learning_hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'RL-scaler+LoadLeast']
 
 
 # 扩缩容消融实验绘图表------LoadLeast
 # - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'temp_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPTD+LoadLeast']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'ensure_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'ensure_scheduler.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'ENSURE']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'no.', 'scale_down_exec': 'default.', 'scale_up_exec': 'no.', 'sche': 'faasflow.', 'instance_cache_policy': 'no_evict.', 'filter': '', 'no_mech_latency': '1'}, 'faasflow']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'LaSS+LoadLeast']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'lass.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+LoadLeast']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+LoadLeast']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'lass.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'LaSS+LoadLeast']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'Q_learning_hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'load_least.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'RL-scaler+LoadLeast']
 
 # 扩缩容消融实验绘图表------bp_balance
 # - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'temp_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPTD+DLO']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'ensure_scaler.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'ensure_scheduler.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'ENSURE']
-# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'no.', 'scale_down_exec': 'default.', 'scale_up_exec': 'no.', 'sche': 'faasflow.', 'instance_cache_policy': 'no_evict.', 'filter': '', 'no_mech_latency': '1'}, 'faasflow']
 # - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'lass.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'LaSS+DLO']
 # - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'HPA+DLO']
+# - [{'rand_seed': '', 'dag_type': 'mix', 'cold_start': 'high', 'fn_type': 'cpu', 'scale_num': 'Q_learning_hpa.', 'scale_down_exec': 'default.', 'scale_up_exec': 'least_task.', 'sche': 'bp_balance.', 'instance_cache_policy': 'no_evict.', 'filter': '(careful_down.)', 'no_mech_latency': '1'}, 'RL-scaler+DLO']
 
 
 # # 调度消融实验------
@@ -74,9 +73,9 @@ targets_alias:
 group on x axis:
 group: 
   by: request_freq
-  types: [low,middle,high]
+  types: [low,middle,high,AliTrace]
   alias: 'Request Frequency'
-  type_alias: ['Low','Middle','High']
+  type_alias: ['Low','Middle','High', 'AliTrace']
 
 # group: 
 #   by: cold_start
