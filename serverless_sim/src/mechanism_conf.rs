@@ -182,6 +182,16 @@ impl MechConfig {
                 let limit = arg.parse::<usize>().expect("Please offer fifo cache policy arg");
                 Box::new(crate::cache::lru::LRUCache::new(limit))
             }
+            "gvgc" => {
+                // 与现有配置兼容：允许空参数，默认容量 256。
+                let limit = if arg.trim().is_empty() {
+                    256
+                } else {
+                    arg.parse::<usize>()
+                        .expect("Please offer gvgc cache policy arg as capacity")
+                };
+                Box::new(crate::cache::gvgc::GVGCCache::new(limit))
+            }
             "no_evict" => Box::new(crate::cache::no_evict::NoEvict::new()),
             _ => panic!("new_instance_cache_policy"),
         }

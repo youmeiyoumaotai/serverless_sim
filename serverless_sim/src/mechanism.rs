@@ -95,7 +95,7 @@ pub const SCHE_NAMES: [&'static str; 12] = [
     // "load_least",
     // "random",
 ];
-pub const SCALE_NUM_NAMES: [&'static str; 8] = [
+pub const SCALE_NUM_NAMES: [&'static str; 9] = [
     "no",
     "hpa",
     "lass",
@@ -104,12 +104,13 @@ pub const SCALE_NUM_NAMES: [&'static str; 8] = [
     "rela",
     "ensure_scaler",
     "Q_learning_hpa",
+    "knee_scaler",
 ];
 pub const SCALE_DOWN_EXEC_NAMES: [&'static str; 1] = ["default"];
 pub const SCALE_UP_EXEC_NAMES: [&'static str; 2] = ["least_task", "no"];
 pub const MECH_NAMES: [&'static str; 3] = ["no_scale", "scale_sche_separated", "scale_sche_joint"];
 pub const FILTER_NAMES: [&'static str; 1] = ["careful_down"];
-pub const INSTANCE_LIVE_NAMES: [&'static str; 3] = ["no_evict", "lru", "fifo"];
+pub const INSTANCE_LIVE_NAMES: [&'static str; 4] = ["no_evict", "lru", "fifo", "gvgc"];
 
 pub trait Mechanism: Send {
     fn step(
@@ -207,7 +208,15 @@ impl ConfigNewMec for Config {
             }
             "scale_sche_separated" => {
                 let allow_sche = vec!["random", "greedy", "hash", "rotate","load_least","pass"];
-                let allow_scale_num = vec!["hpa", "lass", "temp_scaler", "full_placement", "rela", "Q_learning_hpa"];
+                let allow_scale_num = vec![
+                    "hpa",
+                    "lass",
+                    "temp_scaler",
+                    "full_placement",
+                    "rela",
+                    "Q_learning_hpa",
+                    "knee_scaler",
+                ];
                 let allow_scale_down_exec = vec!["default"];
                 let allow_scale_up_exec = vec!["least_task"];
 
@@ -225,7 +234,16 @@ impl ConfigNewMec for Config {
             }
             "scale_sche_joint" => {
                 let allow_sche = vec!["pos", "bp_balance", "ensure_scheduler"];
-                let allow_scale_num = vec!["hpa", "lass", "temp_scaler", "full_placement", "rela", "ensure_scaler", "Q_learning_hpa"];
+                let allow_scale_num = vec![
+                    "hpa",
+                    "lass",
+                    "temp_scaler",
+                    "full_placement",
+                    "rela",
+                    "ensure_scaler",
+                    "Q_learning_hpa",
+                    "knee_scaler",
+                ];
                 let allow_scale_down_exec = vec!["default"];
                 let allow_scale_up_exec = vec!["least_task"];
                 if

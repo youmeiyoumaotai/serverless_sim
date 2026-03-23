@@ -5,14 +5,15 @@
     "scale_sche_joint": null
   },
   "scale_num": {
+    "temp_scaler": null,
+    "no": null,
+    "lass": null,
+    "rela": null,
+    "knee_scaler": null,
     "hpa": null,
     "Q_learning_hpa": null,
-    "temp_scaler": null,
-    "lass": null,
-    "no": null,
-    "full_placement": null,
-    "rela": null,
-    "ensure_scaler": null
+    "ensure_scaler": null,
+    "full_placement": null
   },
   "scale_down_exec": {
     "default": null
@@ -22,25 +23,26 @@
     "no": null
   },
   "sche": {
-    "rotate": null,
-    "pass": null,
-    "consistenthash": null,
     "ensure_scheduler": null,
-    "load_least": null,
-    "bp_balance": null,
-    "fnsche": null,
-    "pos": null,
-    "faasflow": null,
     "hash": null,
+    "rotate": null,
+    "pos": null,
+    "bp_balance": null,
+    "pass": null,
+    "faasflow": null,
+    "fnsche": null,
     "random": null,
-    "greedy": null
+    "greedy": null,
+    "load_least": null,
+    "consistenthash": null
   },
   "filter": {
     "careful_down": null
   },
   "instance_cache_policy": {
     "no_evict": null,
+    "fifo": null,
     "lru": null,
-    "fifo": null
+    "gvgc": null
   }
 }

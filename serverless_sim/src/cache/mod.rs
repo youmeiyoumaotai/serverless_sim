@@ -1,4 +1,5 @@
 pub mod fifo;
+pub mod gvgc;
 pub mod lru;
 pub mod no_evict;
 

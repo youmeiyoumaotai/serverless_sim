@@ -1,4 +1,5 @@
-use super::ScaleUpExec;
+﻿use super::ScaleUpExec;
+use crate::cache::gvgc::global_fn_score;
 use crate::mechanism_thread::{MechCmdDistributor, MechScheduleOnceRes};
 use crate::node::EnvNodeExt;
 use crate::with_env_sub::WithEnvHelp;
@@ -35,24 +36,43 @@ impl ScaleUpExec for LeastTaskScaleUpExec {
 
         let nodes_with_container_cnt = env.nodes().len() - nodes_no_container.len();
 
-        // log::info!("nodes_no_container.len(): {}", nodes_no_container.len());
-        // MARK 修复了一个扩容bug
-        if nodes_with_container_cnt < target_cnt && nodes_no_container.len() > 0 {
+        if nodes_with_container_cnt < target_cnt && !nodes_no_container.is_empty() {
             let to_scale_up_cnt = std::cmp::min(
                 target_cnt - nodes_with_container_cnt,
                 nodes_no_container.len(),
             );
-            // 对不含容器的节点按照其所有任务数量进行降序排序
-            nodes_no_container.sort_by(|&a, &b| {
-                let acnt = mech_metric().node_task_new_cnt(a);
-                let bcnt = mech_metric().node_task_new_cnt(b);
-                acnt.partial_cmp(&bcnt).unwrap()
-            });
-            // 反转，即优先选择任务数量最少的节点进行预加载
+
+            let cache_policy = env.help().config().mech.instance_cache_policy_conf().0;
+            if cache_policy == "gvgc" {
+                // GVGC: choose candidate node with lowest hot-pressure score.
+                nodes_no_container.sort_by(|&a, &b| {
+                    let node_hot_pressure = |nid| {
+                        let node = env.node(nid);
+                        let score = node
+                            .fn_containers
+                            .borrow()
+                            .keys()
+                            .map(|fid| global_fn_score(*fid))
+                            .sum::<f32>();
+                        score
+                    };
+                    let ap = node_hot_pressure(a);
+                    let bp = node_hot_pressure(b);
+                    ap.partial_cmp(&bp).unwrap_or(std::cmp::Ordering::Equal)
+                });
+            } else {
+                // Keep original behavior: prefer nodes with fewer tasks.
+                nodes_no_container.sort_by(|&a, &b| {
+                    let acnt = mech_metric().node_task_new_cnt(a);
+                    let bcnt = mech_metric().node_task_new_cnt(b);
+                    acnt.partial_cmp(&bcnt).unwrap()
+                });
+            }
+
             nodes_no_container.reverse();
             for _ in 0..to_scale_up_cnt {
                 let node_2_load_contaienr = nodes_no_container.pop().unwrap();
-                cmd_distributor.send(MechScheduleOnceRes::ScaleUpCmd(UpCmd {
+                let _ = cmd_distributor.send(MechScheduleOnceRes::ScaleUpCmd(UpCmd {
                     nid: node_2_load_contaienr,
                     fnid,
                 }));
