@@ -79,10 +79,11 @@ impl<S: SameTarget> CheckDup for Vec<S> {
     }
 }
 
-pub const SCHE_NAMES: [&'static str; 12] = [
+pub const SCHE_NAMES: [&'static str; 13] = [
     "rotate",
     "hash",
     "bp_balance",
+    "bcws",
     "faasflow",
     "pass",
     "pos",
@@ -182,6 +183,7 @@ impl ConfigNewMec for Config {
                 let allow_sche = vec![
                     "faasflow",
                     "pass",
+                    "bcws",
                     "fnsche",
                     "random",
                     "greedy",
@@ -207,7 +209,15 @@ impl ConfigNewMec for Config {
                 }
             }
             "scale_sche_separated" => {
-                let allow_sche = vec!["random", "greedy", "hash", "rotate","load_least","pass"];
+                let allow_sche = vec![
+                    "random",
+                    "greedy",
+                    "hash",
+                    "rotate",
+                    "load_least",
+                    "pass",
+                    "bcws",
+                ];
                 let allow_scale_num = vec![
                     "hpa",
                     "lass",
