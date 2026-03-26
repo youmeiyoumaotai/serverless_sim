@@ -1,4 +1,6 @@
 use crate::cache::no_evict::NoEvict;
+use crate::cache::faascache::register_fn_profile;
+use crate::cache::scache::register_fn_profile as register_scache_profile;
 use crate::cache::InstanceCachePolicy;
 use crate::config::Config;
 use crate::with_env_sub::WithEnvHelp;
@@ -256,6 +258,10 @@ impl Node {
             // log::info!("已经添加了{}", fnid);
             return;
         }
+        let func = env.func(fnid);
+        register_fn_profile(fnid, func.cold_start_time as f32, func.container_mem());
+        register_scache_profile(fnid, func.cold_start_time as f32, func.container_mem());
+        drop(func);
 
         let (old, flag) = unsafe {
             let node = NonNull::new_unchecked(self as *const Node as *mut Node);

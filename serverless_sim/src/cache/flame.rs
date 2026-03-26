@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 use std::sync::{Mutex, OnceLock};
 
@@ -6,23 +7,22 @@ use crate::fn_dag::FnId;
 use super::InstanceCachePolicy;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum Generation {
-    Young,
-    Old,
+enum CacheSpace {
+    Protected,
+    Temporary,
 }
 
 struct CacheEntry {
-    gen: Generation,
+    space: CacheSpace,
     hit_count: u64,
     last_touch_tick: u64,
 }
 
 struct GlobalHotController {
-    alpha: f32,
-    cover_threshold: f32,
+    region_size: f32,
     period_ops: u64,
     op_in_period: u64,
-    period_counts: HashMap<FnId, u64>,
+    current_counts: HashMap<FnId, u64>,
     scores: HashMap<FnId, f32>,
     hot_set: HashSet<FnId>,
 }
@@ -30,18 +30,17 @@ struct GlobalHotController {
 impl GlobalHotController {
     fn new() -> Self {
         Self {
-            alpha: 0.3,
-            cover_threshold: 0.8,
+            region_size: 0.5,
             period_ops: 200,
             op_in_period: 0,
-            period_counts: HashMap::new(),
+            current_counts: HashMap::new(),
             scores: HashMap::new(),
             hot_set: HashSet::new(),
         }
     }
 
     fn record_access(&mut self, fnid: FnId) {
-        self.period_counts
+        self.current_counts
             .entry(fnid)
             .and_modify(|v| *v += 1)
             .or_insert(1);
@@ -54,13 +53,17 @@ impl GlobalHotController {
     fn refresh(&mut self) {
         let mut all_fn_ids: HashSet<FnId> = HashSet::new();
         all_fn_ids.extend(self.scores.keys().copied());
-        all_fn_ids.extend(self.period_counts.keys().copied());
+        all_fn_ids.extend(self.current_counts.keys().copied());
 
         for fnid in all_fn_ids {
-            let c_t = self.period_counts.remove(&fnid).unwrap_or(0) as f32;
+            let current = self.current_counts.remove(&fnid).unwrap_or(0) as f32;
             let prev = self.scores.get(&fnid).copied().unwrap_or(0.0);
-            let s_t = self.alpha * c_t + (1.0 - self.alpha) * prev;
-            self.scores.insert(fnid, s_t);
+            let score = current + 0.5 * prev;
+            if score > 0.00001 {
+                self.scores.insert(fnid, score);
+            } else {
+                self.scores.remove(&fnid);
+            }
         }
 
         self.op_in_period = 0;
@@ -68,25 +71,19 @@ impl GlobalHotController {
     }
 
     fn rebuild_hot_set(&mut self) {
-        let mut sorted: Vec<(FnId, f32)> = self
+        let mut sorted = self
             .scores
             .iter()
-            .filter_map(|(fnid, score)| {
-                if *score > 0.0 {
-                    Some((*fnid, *score))
-                } else {
-                    None
-                }
-            })
-            .collect();
-        sorted.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+            .map(|(fnid, score)| (*fnid, *score))
+            .collect::<Vec<_>>();
+        sorted.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(Ordering::Equal));
 
         self.hot_set.clear();
         if sorted.is_empty() {
             return;
         }
 
-        let total: f32 = sorted.iter().map(|(_, s)| *s).sum();
+        let total = sorted.iter().map(|(_, score)| *score).sum::<f32>();
         if total <= 0.00001 {
             return;
         }
@@ -95,7 +92,7 @@ impl GlobalHotController {
         for (fnid, score) in sorted {
             self.hot_set.insert(fnid);
             accum += score;
-            if accum / total >= self.cover_threshold {
+            if accum >= self.region_size * total {
                 break;
             }
         }
@@ -115,7 +112,7 @@ fn global_controller() -> &'static Mutex<GlobalHotController> {
     CTRL.get_or_init(|| Mutex::new(GlobalHotController::new()))
 }
 
-pub fn global_record_access(fnid: FnId) {
+fn global_record_access(fnid: FnId) {
     let mut ctrl = global_controller().lock().unwrap();
     ctrl.record_access(fnid);
 }
@@ -130,21 +127,22 @@ pub fn global_fn_score(fnid: FnId) -> f32 {
     ctrl.score(fnid)
 }
 
-pub struct GVGCCache {
+pub struct FlameCache {
     capacity: usize,
     entries: HashMap<FnId, CacheEntry>,
     tick: u64,
     ttl_ticks: u64,
 }
 
-impl GVGCCache {
+impl FlameCache {
     pub fn new(capacity: usize) -> Self {
         Self {
             capacity,
             entries: HashMap::new(),
             tick: 0,
-            // 用操作步数近似时间窗口，避免改动全局帧时钟。
-            ttl_ticks: 120,
+            // Flame keeps non-hot functions in temporary space with keep-alive.
+            // We approximate the keep-alive window with operation ticks.
+            ttl_ticks: 300,
         }
     }
 
@@ -152,79 +150,87 @@ impl GVGCCache {
         self.tick += 1;
     }
 
-    fn migrate_generations(&mut self) {
+    fn sync_spaces(&mut self) {
         for (fnid, entry) in self.entries.iter_mut() {
-            let hot = global_is_hot(*fnid);
-            match (entry.gen, hot) {
-                (Generation::Young, true) => {
-                    entry.gen = Generation::Old;
-                }
-                (Generation::Old, false) => {
-                    entry.gen = Generation::Young;
-                    entry.last_touch_tick = self.tick;
-                }
-                _ => {}
-            }
+            entry.space = if global_is_hot(*fnid) {
+                CacheSpace::Protected
+            } else {
+                CacheSpace::Temporary
+            };
         }
     }
 
-    fn evict_expired_young(
-        &mut self,
-        mut can_be_evict: impl FnMut(&FnId) -> bool,
-    ) -> Vec<FnId> {
-        let expired: Vec<FnId> = self
-            .entries
-            .iter()
-            .filter_map(|(fnid, entry)| {
-                if entry.gen != Generation::Young {
-                    return None;
-                }
-                if self.tick.saturating_sub(entry.last_touch_tick) < self.ttl_ticks {
-                    return None;
-                }
-                if !can_be_evict(fnid) {
-                    return None;
-                }
-                Some(*fnid)
-            })
-            .collect();
-
-        for fnid in expired.iter() {
-            self.entries.remove(fnid);
-        }
-        expired
+    fn is_expired_temporary(&self, entry: &CacheEntry) -> bool {
+        entry.space == CacheSpace::Temporary
+            && self.tick.saturating_sub(entry.last_touch_tick) >= self.ttl_ticks
     }
 
-    fn evict_one_young_by_utility(
+    fn evict_temporary(
         &mut self,
         mut can_be_evict: impl FnMut(&FnId) -> bool,
     ) -> Option<FnId> {
         let victim = self
             .entries
             .iter()
-            .filter(|(fnid, e)| e.gen == Generation::Young && can_be_evict(fnid))
-            .min_by(|(_, a), (_, b)| {
-                let ua = a.hit_count as f32;
-                let ub = b.hit_count as f32;
-                ua.partial_cmp(&ub)
-                    .unwrap_or(std::cmp::Ordering::Equal)
-                    .then_with(|| a.last_touch_tick.cmp(&b.last_touch_tick))
+            .filter(|(fnid, entry)| {
+                entry.space == CacheSpace::Temporary && can_be_evict(fnid)
+            })
+            .min_by(|(fnid_a, entry_a), (fnid_b, entry_b)| {
+                let expired_a = self.is_expired_temporary(entry_a);
+                let expired_b = self.is_expired_temporary(entry_b);
+
+                (!expired_a)
+                    .cmp(&(!expired_b))
+                    .then_with(|| entry_a.hit_count.cmp(&entry_b.hit_count))
+                    .then_with(|| entry_a.last_touch_tick.cmp(&entry_b.last_touch_tick))
+                    .then_with(|| fnid_a.cmp(fnid_b))
             })
             .map(|(fnid, _)| *fnid);
 
-        if let Some(v) = victim {
-            self.entries.remove(&v);
-            return Some(v);
+        if let Some(victim) = victim {
+            self.entries.remove(&victim);
+            return Some(victim);
+        }
+        None
+    }
+
+    fn reclaim_protected(
+        &mut self,
+        mut can_be_evict: impl FnMut(&FnId) -> bool,
+    ) -> Option<FnId> {
+        let victim = self
+            .entries
+            .iter()
+            .filter(|(fnid, entry)| {
+                entry.space == CacheSpace::Protected && can_be_evict(fnid)
+            })
+            .min_by(|(fnid_a, entry_a), (fnid_b, entry_b)| {
+                let age_a = self.tick.saturating_sub(entry_a.last_touch_tick).max(1) as f32;
+                let age_b = self.tick.saturating_sub(entry_b.last_touch_tick).max(1) as f32;
+                let reuse_a = (entry_a.hit_count as f32) / age_a;
+                let reuse_b = (entry_b.hit_count as f32) / age_b;
+
+                reuse_a
+                    .partial_cmp(&reuse_b)
+                    .unwrap_or(Ordering::Equal)
+                    .then_with(|| entry_a.last_touch_tick.cmp(&entry_b.last_touch_tick))
+                    .then_with(|| fnid_a.cmp(fnid_b))
+            })
+            .map(|(fnid, _)| *fnid);
+
+        if let Some(victim) = victim {
+            self.entries.remove(&victim);
+            return Some(victim);
         }
         None
     }
 }
 
-impl InstanceCachePolicy<FnId> for GVGCCache {
+impl InstanceCachePolicy<FnId> for FlameCache {
     fn get(&mut self, key: FnId) -> Option<FnId> {
         self.next_tick();
         global_record_access(key);
-        self.migrate_generations();
+        self.sync_spaces();
 
         if let Some(entry) = self.entries.get_mut(&key) {
             entry.hit_count += 1;
@@ -241,7 +247,7 @@ impl InstanceCachePolicy<FnId> for GVGCCache {
     ) -> (Option<FnId>, bool) {
         self.next_tick();
         global_record_access(key);
-        self.migrate_generations();
+        self.sync_spaces();
 
         if let Some(entry) = self.entries.get_mut(&key) {
             entry.hit_count += 1;
@@ -249,27 +255,32 @@ impl InstanceCachePolicy<FnId> for GVGCCache {
             return (None, true);
         }
 
-        let mut evicted: Option<FnId> = None;
-        if self.entries.len() >= self.capacity {
-            let _ = self.evict_expired_young(|fnid| can_be_evict(fnid));
-        }
+        let target_space = if global_is_hot(key) {
+            CacheSpace::Protected
+        } else {
+            CacheSpace::Temporary
+        };
+
+        let mut evicted = None;
         while self.entries.len() >= self.capacity {
-            let one = self.evict_one_young_by_utility(|fnid| can_be_evict(fnid));
-            if one.is_none() {
+            let victim = self.evict_temporary(|fnid| can_be_evict(fnid)).or_else(|| {
+                if target_space == CacheSpace::Protected {
+                    self.reclaim_protected(|fnid| can_be_evict(fnid))
+                } else {
+                    None
+                }
+            });
+
+            let Some(victim) = victim else {
                 return (None, false);
-            }
-            evicted = one;
+            };
+            evicted = Some(victim);
         }
 
-        let gen = if global_is_hot(key) {
-            Generation::Old
-        } else {
-            Generation::Young
-        };
         self.entries.insert(
             key,
             CacheEntry {
-                gen,
+                space: target_space,
                 hit_count: 1,
                 last_touch_tick: self.tick,
             },
@@ -283,5 +294,4 @@ impl InstanceCachePolicy<FnId> for GVGCCache {
     }
 }
 
-unsafe impl Send for GVGCCache {}
-
+unsafe impl Send for FlameCache {}
